@@ -28,11 +28,14 @@ class MyPage extends StatelessWidget {
         title: const Text('Resizable Widget Example'),
       ),
       body: ResizableWidget(
-      children: [
-        Expanded(child: Container(color: Colors.greenAccent)),
-        Expanded(child: Container(color: Colors.yellowAccent)),
-        Expanded(child: Container(color: Colors.redAccent)),
-      ],
+        isColumnChildren: false,
+        separatorColor: Colors.white12,
+        separatorSize: 4,
+        children: [
+          Expanded(child: Container(color: Colors.greenAccent)),
+          Expanded(child: Container(color: Colors.yellowAccent)),
+          Expanded(child: Container(color: Colors.redAccent)),
+        ],
       ),
     );
   }
