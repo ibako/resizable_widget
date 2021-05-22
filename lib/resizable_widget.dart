@@ -3,7 +3,8 @@ library resizable_widget;
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-/// A Calculator.
+/// Holds resizable widgets as children.
+/// Users can resize inner widgets by dragging.
 class ResizableWidget extends StatefulWidget {
   /// Resizable widget list.
   final List<Widget> children;
