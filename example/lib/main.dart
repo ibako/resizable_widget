@@ -33,7 +33,16 @@ class MyPage extends StatelessWidget {
         separatorSize: 4,
         children: [
           Container(color: Colors.greenAccent),
-          Container(color: Colors.yellowAccent),
+          ResizableWidget(
+            isColumnChildren: true,
+            separatorColor: Colors.blue,
+            separatorSize: 10,
+            children: [
+              Container(color: Colors.greenAccent),
+              Container(color: Colors.yellowAccent),
+              Container(color: Colors.redAccent),
+            ],
+          ),
           Container(color: Colors.redAccent),
         ],
       ),
