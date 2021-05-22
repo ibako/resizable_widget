@@ -32,9 +32,9 @@ class MyPage extends StatelessWidget {
         separatorColor: Colors.white12,
         separatorSize: 4,
         children: [
-          Expanded(child: Container(color: Colors.greenAccent)),
-          Expanded(child: Container(color: Colors.yellowAccent)),
-          Expanded(child: Container(color: Colors.redAccent)),
+          Container(color: Colors.greenAccent),
+          Container(color: Colors.yellowAccent),
+          Container(color: Colors.redAccent),
         ],
       ),
     );
