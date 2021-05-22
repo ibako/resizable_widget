@@ -181,10 +181,14 @@ class _SeparatorState extends State<_Separator> {
   @override
   Widget build(BuildContext context) =>
       GestureDetector(
-        child: SizedBox(
-          child: Container(color: widget.color),
-          width: widget.isColumnSeparator ? double.infinity : widget.size,
-          height: widget.isColumnSeparator ? widget.size : double.infinity,
+        child: MouseRegion(
+          cursor: widget.isColumnSeparator
+              ? SystemMouseCursors.resizeRow : SystemMouseCursors.resizeColumn,
+          child: SizedBox(
+            child: Container(color: widget.color),
+            width: widget.isColumnSeparator ? double.infinity : widget.size,
+            height: widget.isColumnSeparator ? widget.size : double.infinity,
+          ),
         ),
         onPanUpdate: (details) => _controller.onPanUpdate(details, context),
       );
