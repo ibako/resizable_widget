@@ -9,7 +9,7 @@ class ResizableWidget extends StatefulWidget {
   /// Resizable widget list.
   final List<Widget> children;
 
-  /// When set to true, creates vertical separators.
+  /// When set to true, creates horizontal separators.
   final bool isColumnChildren;
 
   /// Separator size.
