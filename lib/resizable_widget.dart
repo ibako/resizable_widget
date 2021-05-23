@@ -73,26 +73,36 @@ class _ResizableWidgetState extends State<ResizableWidget> {
       );
 
   void _setSizeIfNeeded(BoxConstraints constraints) {
-    if (children.isEmpty || children[0].size != null) {
-      return;
-    }
-
-    var remain = widget.isColumnChildren
+    final maxSize = widget.isColumnChildren
         ? constraints.maxHeight : constraints.maxWidth;
-    var count = 0;
-    for (var c in children) {
-      if (c.widget is _Separator) {
-        remain -= widget.separatorSize;
-      } else {
-        count++;
-      }
-    }
-
-    if (count == 0) {
+    var isWindowSizeChanged = _controller.maxSize == null ||
+        _controller.maxSize! != maxSize;
+    if (!isWindowSizeChanged || children.isEmpty) {
       return;
     }
-    for (var c in children) {
-      c.size = remain / count;
+
+    _controller.maxSize = maxSize;
+    var remain = _controller.maxSizeWithoutSeparators!;
+
+    if (children[0].size == null) {
+      // initialization
+      var count = children.length ~/ 2 + 1;
+      for (var c in children) {
+        if (c.widget is _Separator) {
+          c.size = widget.separatorSize;
+          c.percentage = 0;
+        } else {
+          c.size = remain / count;
+          c.percentage = c.size! / remain;
+        }
+      }
+    } else {
+      // when window size changed
+      for (var c in children) {
+        if (c.widget is! _Separator) {
+          c.size = remain * c.percentage!;
+        }
+      }
     }
   }
 
@@ -112,12 +122,16 @@ class _ResizableWidgetState extends State<ResizableWidget> {
 class _ResizableWidgetChild {
   final Widget widget;
   double? size;
+  double? percentage;
   _ResizableWidgetChild(this.widget);
 }
 
 class _ResizableWidgetController {
   final _ResizableWidgetState _state;
   final eventStream = StreamController<Object>();
+  double? maxSize;
+  double? get maxSizeWithoutSeparators => maxSize == null
+      ? null : maxSize! - (_state.children.length ~/ 2) * _state.widget.separatorSize;
 
   _ResizableWidgetController(this._state);
 
@@ -145,6 +159,8 @@ class _ResizableWidgetController {
     final size = _state.children[widgetIndex].size ?? 0;
     _state.children[widgetIndex].size = size +
         (_state.widget.isColumnChildren ? offset.dy : offset.dx);
+    _state.children[widgetIndex].percentage =
+        _state.children[widgetIndex].size! / maxSizeWithoutSeparators!;
     return _state.children[widgetIndex].size!;
   }
 }
