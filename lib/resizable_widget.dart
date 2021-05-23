@@ -44,29 +44,27 @@ class _ResizableWidgetState extends State<ResizableWidget> {
     final separatorNum = originalChildren.length - 1;
     for (var i = 0; i < separatorNum; i++) {
       _controller.children.add(_ResizableWidgetChildData(originalChildren[i]));
-      _controller.children.add(_ResizableWidgetChildData(
-          _Separator(
-            2 * i + 1,
-            _controller,
-            isColumnSeparator: widget.isColumnChildren,
-            size: widget.separatorSize,
-            color: widget.separatorColor,
-          )
-      ));
+      _controller.children.add(_ResizableWidgetChildData(_Separator(
+        2 * i + 1,
+        _controller,
+        isColumnSeparator: widget.isColumnChildren,
+        size: widget.separatorSize,
+        color: widget.separatorColor,
+      )));
     }
     _controller.children.add(_ResizableWidgetChildData(
         originalChildren[originalChildren.length - 1]));
   }
 
   @override
-  Widget build(BuildContext context) =>
-      LayoutBuilder(
+  Widget build(BuildContext context) => LayoutBuilder(
         builder: (context, constraints) {
           _controller.setSizeIfNeeded(constraints);
           return StreamBuilder(
             stream: _controller.eventStream.stream,
             builder: (context, snapshot) => _controller.isColumnChildren
-                ? Column(children: _controller.children.map(_buildChild).toList())
+                ? Column(
+                    children: _controller.children.map(_buildChild).toList())
                 : Row(children: _controller.children.map(_buildChild).toList()),
           );
         },
@@ -99,13 +97,13 @@ class _ResizableWidgetController {
   final bool isColumnChildren;
   double? maxSize;
   double? get maxSizeWithoutSeparators => maxSize == null
-      ? null : maxSize! - (children.length ~/ 2) * separatorSize;
+      ? null
+      : maxSize! - (children.length ~/ 2) * separatorSize;
 
   _ResizableWidgetController(this.separatorSize, this.isColumnChildren);
 
   void setSizeIfNeeded(BoxConstraints constraints) {
-    final max = isColumnChildren
-        ? constraints.maxHeight : constraints.maxWidth;
+    final max = isColumnChildren ? constraints.maxHeight : constraints.maxWidth;
     var isMaxSizeChanged = maxSize == null || maxSize! != max;
     if (!isMaxSizeChanged || children.isEmpty) {
       return;
@@ -141,16 +139,16 @@ class _ResizableWidgetController {
     final rightSize = _resizeImpl(separatorIndex + 1, offset * (-1));
 
     if (leftSize < 0) {
-      _resizeImpl(separatorIndex - 1, isColumnChildren
-          ? Offset(0, -leftSize) : Offset(-leftSize, 0));
-      _resizeImpl(separatorIndex + 1, isColumnChildren
-          ? Offset(0, leftSize) : Offset(leftSize, 0));
+      _resizeImpl(separatorIndex - 1,
+          isColumnChildren ? Offset(0, -leftSize) : Offset(-leftSize, 0));
+      _resizeImpl(separatorIndex + 1,
+          isColumnChildren ? Offset(0, leftSize) : Offset(leftSize, 0));
     }
     if (rightSize < 0) {
-      _resizeImpl(separatorIndex - 1, isColumnChildren
-          ? Offset(0, rightSize) : Offset(rightSize, 0));
-      _resizeImpl(separatorIndex + 1, isColumnChildren
-          ? Offset(0, -rightSize) : Offset(-rightSize, 0));
+      _resizeImpl(separatorIndex - 1,
+          isColumnChildren ? Offset(0, rightSize) : Offset(rightSize, 0));
+      _resizeImpl(separatorIndex + 1,
+          isColumnChildren ? Offset(0, -rightSize) : Offset(-rightSize, 0));
     }
 
     eventStream.add(this);
@@ -158,8 +156,8 @@ class _ResizableWidgetController {
 
   double _resizeImpl(int widgetIndex, Offset offset) {
     final size = children[widgetIndex].size ?? 0;
-    children[widgetIndex].size = size +
-        (isColumnChildren ? offset.dy : offset.dx);
+    children[widgetIndex].size =
+        size + (isColumnChildren ? offset.dy : offset.dx);
     children[widgetIndex].percentage =
         children[widgetIndex].size! / maxSizeWithoutSeparators!;
     return children[widgetIndex].size!;
@@ -174,13 +172,13 @@ class _Separator extends StatefulWidget {
   final Color color;
 
   const _Separator(
-      this._index,
-      this._parentController, {
-        Key? key,
-        required this.isColumnSeparator,
-        required this.size,
-        required this.color,
-      }) : super(key: key);
+    this._index,
+    this._parentController, {
+    Key? key,
+    required this.isColumnSeparator,
+    required this.size,
+    required this.color,
+  }) : super(key: key);
 
   @override
   _SeparatorState createState() => _SeparatorState();
@@ -197,11 +195,11 @@ class _SeparatorState extends State<_Separator> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      GestureDetector(
+  Widget build(BuildContext context) => GestureDetector(
         child: MouseRegion(
           cursor: widget.isColumnSeparator
-              ? SystemMouseCursors.resizeRow : SystemMouseCursors.resizeColumn,
+              ? SystemMouseCursors.resizeRow
+              : SystemMouseCursors.resizeColumn,
           child: SizedBox(
             child: Container(color: widget.color),
             width: widget.isColumnSeparator ? double.infinity : widget.size,
