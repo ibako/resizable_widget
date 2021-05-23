@@ -32,19 +32,19 @@ class ResizableWidget extends StatefulWidget {
 }
 
 class _ResizableWidgetState extends State<ResizableWidget> {
-  final children = <_ResizableWidgetChild>[];
   late _ResizableWidgetController _controller;
 
   @override
   void initState() {
     super.initState();
 
-    _controller = _ResizableWidgetController(this);
+    _controller = _ResizableWidgetController(
+        widget.separatorSize, widget.isColumnChildren);
     final originalChildren = widget.children;
     final separatorNum = originalChildren.length - 1;
     for (var i = 0; i < separatorNum; i++) {
-      children.add(_ResizableWidgetChild(originalChildren[i]));
-      children.add(_ResizableWidgetChild(
+      _controller.children.add(_ResizableWidgetChildData(originalChildren[i]));
+      _controller.children.add(_ResizableWidgetChildData(
           _Separator(
             2 * i + 1,
             _controller,
@@ -54,7 +54,7 @@ class _ResizableWidgetState extends State<ResizableWidget> {
           )
       ));
     }
-    children.add(_ResizableWidgetChild(
+    _controller.children.add(_ResizableWidgetChildData(
         originalChildren[originalChildren.length - 1]));
   }
 
@@ -62,34 +62,64 @@ class _ResizableWidgetState extends State<ResizableWidget> {
   Widget build(BuildContext context) =>
       LayoutBuilder(
         builder: (context, constraints) {
-          _setSizeIfNeeded(constraints);
+          _controller.setSizeIfNeeded(constraints);
           return StreamBuilder(
-              stream: _controller.eventStream.stream,
-              builder: (context, snapshot) => widget.isColumnChildren
-                  ? Column(children: children.map(_buildChild).toList())
-                  : Row(children: children.map(_buildChild).toList()),
+            stream: _controller.eventStream.stream,
+            builder: (context, snapshot) => _controller.isColumnChildren
+                ? Column(children: _controller.children.map(_buildChild).toList())
+                : Row(children: _controller.children.map(_buildChild).toList()),
           );
         },
       );
 
-  void _setSizeIfNeeded(BoxConstraints constraints) {
-    final maxSize = widget.isColumnChildren
+  Widget _buildChild(_ResizableWidgetChildData child) {
+    if (child.widget is _Separator) {
+      return child.widget;
+    }
+
+    return SizedBox(
+      width: widget.isColumnChildren ? double.infinity : child.size,
+      height: widget.isColumnChildren ? child.size : double.infinity,
+      child: child.widget,
+    );
+  }
+}
+
+class _ResizableWidgetChildData {
+  final Widget widget;
+  double? size;
+  double? percentage;
+  _ResizableWidgetChildData(this.widget);
+}
+
+class _ResizableWidgetController {
+  final eventStream = StreamController<Object>();
+  final children = <_ResizableWidgetChildData>[];
+  final double separatorSize;
+  final bool isColumnChildren;
+  double? maxSize;
+  double? get maxSizeWithoutSeparators => maxSize == null
+      ? null : maxSize! - (children.length ~/ 2) * separatorSize;
+
+  _ResizableWidgetController(this.separatorSize, this.isColumnChildren);
+
+  void setSizeIfNeeded(BoxConstraints constraints) {
+    final max = isColumnChildren
         ? constraints.maxHeight : constraints.maxWidth;
-    var isWindowSizeChanged = _controller.maxSize == null ||
-        _controller.maxSize! != maxSize;
-    if (!isWindowSizeChanged || children.isEmpty) {
+    var isMaxSizeChanged = maxSize == null || maxSize! != max;
+    if (!isMaxSizeChanged || children.isEmpty) {
       return;
     }
 
-    _controller.maxSize = maxSize;
-    var remain = _controller.maxSizeWithoutSeparators!;
+    maxSize = max;
+    var remain = maxSizeWithoutSeparators!;
 
     if (children[0].size == null) {
       // initialization
       var count = children.length ~/ 2 + 1;
       for (var c in children) {
         if (c.widget is _Separator) {
-          c.size = widget.separatorSize;
+          c.size = separatorSize;
           c.percentage = 0;
         } else {
           c.size = remain / count;
@@ -106,49 +136,20 @@ class _ResizableWidgetState extends State<ResizableWidget> {
     }
   }
 
-  Widget _buildChild(_ResizableWidgetChild child) {
-    if (child.widget is _Separator) {
-      return child.widget;
-    }
-
-    return SizedBox(
-      width: widget.isColumnChildren ? double.infinity : child.size,
-      height: widget.isColumnChildren ? child.size : double.infinity,
-      child: child.widget,
-    );
-  }
-}
-
-class _ResizableWidgetChild {
-  final Widget widget;
-  double? size;
-  double? percentage;
-  _ResizableWidgetChild(this.widget);
-}
-
-class _ResizableWidgetController {
-  final _ResizableWidgetState _state;
-  final eventStream = StreamController<Object>();
-  double? maxSize;
-  double? get maxSizeWithoutSeparators => maxSize == null
-      ? null : maxSize! - (_state.children.length ~/ 2) * _state.widget.separatorSize;
-
-  _ResizableWidgetController(this._state);
-
   void resize(int separatorIndex, Offset offset) {
     final leftSize = _resizeImpl(separatorIndex - 1, offset);
     final rightSize = _resizeImpl(separatorIndex + 1, offset * (-1));
 
     if (leftSize < 0) {
-      _resizeImpl(separatorIndex - 1, _state.widget.isColumnChildren
+      _resizeImpl(separatorIndex - 1, isColumnChildren
           ? Offset(0, -leftSize) : Offset(-leftSize, 0));
-      _resizeImpl(separatorIndex + 1, _state.widget.isColumnChildren
+      _resizeImpl(separatorIndex + 1, isColumnChildren
           ? Offset(0, leftSize) : Offset(leftSize, 0));
     }
     if (rightSize < 0) {
-      _resizeImpl(separatorIndex - 1, _state.widget.isColumnChildren
+      _resizeImpl(separatorIndex - 1, isColumnChildren
           ? Offset(0, rightSize) : Offset(rightSize, 0));
-      _resizeImpl(separatorIndex + 1, _state.widget.isColumnChildren
+      _resizeImpl(separatorIndex + 1, isColumnChildren
           ? Offset(0, -rightSize) : Offset(-rightSize, 0));
     }
 
@@ -156,12 +157,12 @@ class _ResizableWidgetController {
   }
 
   double _resizeImpl(int widgetIndex, Offset offset) {
-    final size = _state.children[widgetIndex].size ?? 0;
-    _state.children[widgetIndex].size = size +
-        (_state.widget.isColumnChildren ? offset.dy : offset.dx);
-    _state.children[widgetIndex].percentage =
-        _state.children[widgetIndex].size! / maxSizeWithoutSeparators!;
-    return _state.children[widgetIndex].size!;
+    final size = children[widgetIndex].size ?? 0;
+    children[widgetIndex].size = size +
+        (isColumnChildren ? offset.dy : offset.dx);
+    children[widgetIndex].percentage =
+        children[widgetIndex].size! / maxSizeWithoutSeparators!;
+    return children[widgetIndex].size!;
   }
 }
 
