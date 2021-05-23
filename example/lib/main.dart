@@ -39,11 +39,14 @@ class MyPage extends StatelessWidget {
             separatorSize: 10,
             children: [
               Container(color: Colors.greenAccent),
-              ResizableWidget(children: [
-                Container(color: Colors.greenAccent),
-                Container(color: Colors.yellowAccent),
-                Container(color: Colors.redAccent),
-              ]),
+              ResizableWidget(
+                children: [
+                  Container(color: Colors.greenAccent),
+                  Container(color: Colors.yellowAccent),
+                  Container(color: Colors.redAccent),
+                ],
+                percentages: const [0.2, 0.5, 0.3],
+              ),
               Container(color: Colors.redAccent),
             ],
           ),

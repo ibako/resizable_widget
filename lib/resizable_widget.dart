@@ -9,6 +9,15 @@ class ResizableWidget extends StatefulWidget {
   /// Resizable widget list.
   final List<Widget> children;
 
+  /// Sets the default [children] width or height as percentages.
+  ///
+  /// If you set this value,
+  /// the length of [percentages] must match the one of [children],
+  /// and the sum of [percentages] must be equal to 1.
+  ///
+  /// If this value is [null], [children] will be split into the same size.
+  final List<double>? percentages;
+
   /// When set to true, creates horizontal separators.
   final bool isColumnChildren;
 
@@ -19,13 +28,19 @@ class ResizableWidget extends StatefulWidget {
   final Color separatorColor;
 
   /// Creates [ResizableWidget].
-  const ResizableWidget({
+  ResizableWidget({
     Key? key,
     required this.children,
+    this.percentages,
     this.isColumnChildren = false,
     this.separatorSize = 4,
     this.separatorColor = Colors.white12,
-  }) : super(key: key);
+  }) : super(key: key) {
+    assert(children.isNotEmpty);
+    assert(percentages == null || percentages!.length == children.length);
+    assert(percentages == null ||
+        percentages!.reduce((value, element) => value + element) == 1);
+  }
 
   @override
   _ResizableWidgetState createState() => _ResizableWidgetState();
@@ -41,19 +56,24 @@ class _ResizableWidgetState extends State<ResizableWidget> {
     _controller = _ResizableWidgetController(
         widget.separatorSize, widget.isColumnChildren);
     final originalChildren = widget.children;
-    final separatorNum = originalChildren.length - 1;
-    for (var i = 0; i < separatorNum; i++) {
-      _controller.children.add(_ResizableWidgetChildData(originalChildren[i]));
-      _controller.children.add(_ResizableWidgetChildData(_Separator(
-        2 * i + 1,
-        _controller,
-        isColumnSeparator: widget.isColumnChildren,
-        size: widget.separatorSize,
-        color: widget.separatorColor,
-      )));
+    final size = originalChildren.length;
+    final originalPercentages =
+        widget.percentages ?? List.filled(size, 1 / size);
+    for (var i = 0; i < size - 1; i++) {
+      _controller.children.add(_ResizableWidgetChildData(
+          originalChildren[i], originalPercentages[i]));
+      _controller.children.add(_ResizableWidgetChildData(
+          _Separator(
+            2 * i + 1,
+            _controller,
+            isColumnSeparator: widget.isColumnChildren,
+            size: widget.separatorSize,
+            color: widget.separatorColor,
+          ),
+          null));
     }
     _controller.children.add(_ResizableWidgetChildData(
-        originalChildren[originalChildren.length - 1]));
+        originalChildren[size - 1], originalPercentages[size - 1]));
   }
 
   @override
@@ -87,7 +107,7 @@ class _ResizableWidgetChildData {
   final Widget widget;
   double? size;
   double? percentage;
-  _ResizableWidgetChildData(this.widget);
+  _ResizableWidgetChildData(this.widget, this.percentage);
 }
 
 class _ResizableWidgetController {
@@ -110,26 +130,14 @@ class _ResizableWidgetController {
     }
 
     maxSize = max;
-    var remain = maxSizeWithoutSeparators!;
+    final remain = maxSizeWithoutSeparators!;
 
-    if (children[0].size == null) {
-      // initialization
-      var count = children.length ~/ 2 + 1;
-      for (var c in children) {
-        if (c.widget is _Separator) {
-          c.size = separatorSize;
-          c.percentage = 0;
-        } else {
-          c.size = remain / count;
-          c.percentage = c.size! / remain;
-        }
-      }
-    } else {
-      // when window size changed
-      for (var c in children) {
-        if (c.widget is! _Separator) {
-          c.size = remain * c.percentage!;
-        }
+    for (var c in children) {
+      if (c.widget is _Separator) {
+        c.percentage = 0;
+        c.size = separatorSize;
+      } else {
+        c.size = remain * c.percentage!;
       }
     }
   }
