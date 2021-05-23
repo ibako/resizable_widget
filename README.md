@@ -39,3 +39,11 @@ class MyPage extends StatelessWidget {
   }
 }
 ```
+
+## Package page (pub.dev)
+
+https://pub.dev/packages/resizable_widget
+
+## API Document
+
+https://pub.dev/documentation/resizable_widget/latest/resizable_widget/resizable_widget-library.html
