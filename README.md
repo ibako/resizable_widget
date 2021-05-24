@@ -1,8 +1,8 @@
 # resizable_widget
 
-`ResizableWidget` Holds resizable widgets as children.
+`ResizableWidget` enables users to resize the internal widgets by dragging.
 
-Users can resize inner widgets by dragging.
+This package contains simple APIs, but if needed, you can customize `ResizableWidget` flexibly.
 
 ## Example
 
@@ -17,21 +17,12 @@ class MyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: ResizableWidget(
-        isColumnChildren: false,
-        separatorColor: Colors.white12,
-        separatorSize: 4,
-        children: [
+        isColumnChildren: false, // optional
+        separatorColor: Colors.white12, // optional
+        separatorSize: 4, // optional
+        children: [ // must
           Container(color: Colors.greenAccent),
-          ResizableWidget(
-            isColumnChildren: true,
-            separatorColor: Colors.blue,
-            separatorSize: 10,
-            children: [
-              Container(color: Colors.greenAccent),
-              Container(color: Colors.yellowAccent),
-              Container(color: Colors.redAccent),
-            ],
-          ),
+          Container(color: Colors.yellowAccent),
           Container(color: Colors.redAccent),
         ],
       ),
