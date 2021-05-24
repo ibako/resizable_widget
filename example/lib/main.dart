@@ -31,6 +31,7 @@ class MyPage extends StatelessWidget {
         isColumnChildren: false,
         separatorColor: Colors.white12,
         separatorSize: 4,
+        onResized: _printResizeInfo,
         children: [
           Container(color: Colors.greenAccent),
           ResizableWidget(
@@ -54,5 +55,10 @@ class MyPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _printResizeInfo(List<WidgetSizeInfo> dataList) {
+    // ignore: avoid_print
+    print(dataList.map((x) => '(${x.size}, ${x.percentage}%)').join(", "));
   }
 }

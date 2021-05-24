@@ -3,8 +3,10 @@ library resizable_widget;
 import 'dart:async';
 import 'package:flutter/material.dart';
 
+typedef _OnResizedFunc = void Function(List<WidgetSizeInfo> dataList);
+
 /// Holds resizable widgets as children.
-/// Users can resize inner widgets by dragging.
+/// Users can resize the internal widgets by dragging.
 class ResizableWidget extends StatefulWidget {
   /// Resizable widget list.
   final List<Widget> children;
@@ -27,6 +29,12 @@ class ResizableWidget extends StatefulWidget {
   /// Separator color.
   final Color separatorColor;
 
+  /// Callback of the resizing event.
+  /// You can get the size and percentage of the internal widgets.
+  ///
+  /// Note that [onResized] is called every frame when resizing [children].
+  final _OnResizedFunc? onResized;
+
   /// Creates [ResizableWidget].
   ResizableWidget({
     Key? key,
@@ -35,6 +43,7 @@ class ResizableWidget extends StatefulWidget {
     this.isColumnChildren = false,
     this.separatorSize = 4,
     this.separatorColor = Colors.white12,
+    this.onResized,
   }) : super(key: key) {
     assert(children.isNotEmpty);
     assert(percentages == null || percentages!.length == children.length);
@@ -46,6 +55,18 @@ class ResizableWidget extends StatefulWidget {
   _ResizableWidgetState createState() => _ResizableWidgetState();
 }
 
+/// Information about an internal widget size of [ResizableWidget].
+class WidgetSizeInfo {
+  /// The actual pixel size.
+  final double size;
+
+  /// The size percentage among the [ResizableWidget] children.
+  final double percentage;
+
+  /// Creates [WidgetSizeInfo].
+  const WidgetSizeInfo(this.size, this.percentage);
+}
+
 class _ResizableWidgetState extends State<ResizableWidget> {
   late _ResizableWidgetController _controller;
 
@@ -54,7 +75,7 @@ class _ResizableWidgetState extends State<ResizableWidget> {
     super.initState();
 
     _controller = _ResizableWidgetController(
-        widget.separatorSize, widget.isColumnChildren);
+        widget.separatorSize, widget.isColumnChildren, widget.onResized);
     final originalChildren = widget.children;
     final size = originalChildren.length;
     final originalPercentages =
@@ -115,12 +136,14 @@ class _ResizableWidgetController {
   final children = <_ResizableWidgetChildData>[];
   final double separatorSize;
   final bool isColumnChildren;
+  final _OnResizedFunc? onResized;
   double? maxSize;
   double? get maxSizeWithoutSeparators => maxSize == null
       ? null
       : maxSize! - (children.length ~/ 2) * separatorSize;
 
-  _ResizableWidgetController(this.separatorSize, this.isColumnChildren);
+  _ResizableWidgetController(
+      this.separatorSize, this.isColumnChildren, this.onResized);
 
   void setSizeIfNeeded(BoxConstraints constraints) {
     final max = isColumnChildren ? constraints.maxHeight : constraints.maxWidth;
@@ -140,6 +163,8 @@ class _ResizableWidgetController {
         c.size = remain * c.percentage!;
       }
     }
+
+    _callOnResized();
   }
 
   void resize(int separatorIndex, Offset offset) {
@@ -160,6 +185,7 @@ class _ResizableWidgetController {
     }
 
     eventStream.add(this);
+    _callOnResized();
   }
 
   double _resizeImpl(int widgetIndex, Offset offset) {
@@ -169,6 +195,13 @@ class _ResizableWidgetController {
     children[widgetIndex].percentage =
         children[widgetIndex].size! / maxSizeWithoutSeparators!;
     return children[widgetIndex].size!;
+  }
+
+  void _callOnResized() {
+    onResized?.call(children
+        .where((x) => x.widget is! _Separator)
+        .map((x) => WidgetSizeInfo(x.size!, x.percentage!))
+        .toList());
   }
 }
 
