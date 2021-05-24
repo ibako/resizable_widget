@@ -1,3 +1,7 @@
+## 1.0.3
+* Add `onResized` callback to `ResizableWidget`.
+* Update README.
+
 ## 1.0.2
 
 * Modify description metadata.
