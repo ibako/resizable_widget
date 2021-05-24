@@ -3,7 +3,7 @@ library resizable_widget;
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-typedef _OnResizedFunc = void Function(List<WidgetSizeInfo> dataList);
+typedef OnResizedFunc = void Function(List<WidgetSizeInfo> infoList);
 
 /// Holds resizable widgets as children.
 /// Users can resize the internal widgets by dragging.
@@ -33,7 +33,7 @@ class ResizableWidget extends StatefulWidget {
   /// You can get the size and percentage of the internal widgets.
   ///
   /// Note that [onResized] is called every frame when resizing [children].
-  final _OnResizedFunc? onResized;
+  final OnResizedFunc? onResized;
 
   /// Creates [ResizableWidget].
   ResizableWidget({
@@ -58,9 +58,14 @@ class ResizableWidget extends StatefulWidget {
 /// Information about an internal widget size of [ResizableWidget].
 class WidgetSizeInfo {
   /// The actual pixel size.
+  ///
+  /// If the app window size is changed, this value will be also changed.
   final double size;
 
   /// The size percentage among the [ResizableWidget] children.
+  ///
+  /// Even if the app window size is changed, this value will not be changed
+  /// because the ratio of the internal widgets will be maintained.
   final double percentage;
 
   /// Creates [WidgetSizeInfo].
@@ -136,7 +141,7 @@ class _ResizableWidgetController {
   final children = <_ResizableWidgetChildData>[];
   final double separatorSize;
   final bool isColumnChildren;
-  final _OnResizedFunc? onResized;
+  final OnResizedFunc? onResized;
   double? maxSize;
   double? get maxSizeWithoutSeparators => maxSize == null
       ? null
