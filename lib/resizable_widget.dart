@@ -3,6 +3,7 @@ library resizable_widget;
 import 'dart:async';
 import 'package:flutter/material.dart';
 
+/// The callback argument type of [ResizableWidget.onResized].
 typedef OnResizedFunc = void Function(List<WidgetSizeInfo> infoList);
 
 /// Holds resizable widgets as children.
