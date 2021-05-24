@@ -1,6 +1,6 @@
 name: resizable_widget
 description: Enables users to resize the internal widgets by dragging. This package contains simple APIs, but if needed, you can customize ResizableWidget flexibly.
-version: 1.0.3
+version: 1.0.4
 repository: https://github.com/ibako/resizable_widget
 
 environment:
