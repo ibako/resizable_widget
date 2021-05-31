@@ -40,5 +40,6 @@ class _SeparatorState extends State<Separator> {
           ),
         ),
         onPanUpdate: (details) => _controller.onPanUpdate(details, context),
+        onDoubleTap: () => _controller.onDoubleTap(),
       );
 }

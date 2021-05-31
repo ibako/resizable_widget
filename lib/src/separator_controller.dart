@@ -10,4 +10,8 @@ class SeparatorController {
   void onPanUpdate(DragUpdateDetails details, BuildContext context) {
     _parentController.resize(_index, details.delta);
   }
+
+  void onDoubleTap() {
+    _parentController.tryHideOrShow(_index);
+  }
 }

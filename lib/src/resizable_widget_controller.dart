@@ -28,6 +28,15 @@ class ResizableWidgetController {
     _model.callOnResized();
   }
 
+  void tryHideOrShow(int separatorIndex) {
+    final result = _model.tryHideOrShow(separatorIndex);
+
+    if (result) {
+      eventStream.add(this);
+      _model.callOnResized();
+    }
+  }
+
   Widget _separatorFactory(SeparatorArgsBasicInfo basicInfo) {
     return Separator(SeparatorArgsInfo(this, basicInfo));
   }

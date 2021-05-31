@@ -56,6 +56,7 @@ class ResizableWidgetModel {
         c.size = _info.separatorSize;
       } else {
         c.size = remain * c.percentage!;
+        c.defaultSize = c.size;
       }
     }
   }
@@ -97,6 +98,36 @@ class ResizableWidgetModel {
         .toList());
   }
 
+  bool tryHideOrShow(int separatorIndex) {
+    final isLeft = separatorIndex == 1;
+    final isRight = separatorIndex == children.length - 2;
+    if (!isLeft && !isRight) {
+      // valid only for both ends.
+      return false;
+    }
+
+    final target = children[isLeft ? 0 : children.length - 1];
+    final size = target.size!;
+    final coefficient = isLeft ? 1 : -1;
+    if (_isNearlyZero(size)) {
+      // show
+      final offsetScala = (target.hidingSize ?? target.defaultSize!) - size;
+      final offset = _info.isHorizontalSeparator
+          ? Offset(0, offsetScala * coefficient)
+          : Offset(offsetScala * coefficient, 0);
+      resize(separatorIndex, offset);
+    } else {
+      // hide
+      target.hidingSize = target.size!;
+      final offset = _info.isHorizontalSeparator
+          ? Offset(0, -target.hidingSize! * coefficient)
+          : Offset(-target.hidingSize! * coefficient, 0);
+      resize(separatorIndex, offset);
+    }
+
+    return true;
+  }
+
   double _resizeImpl(int widgetIndex, Offset offset) {
     final size = children[widgetIndex].size ?? 0;
     children[widgetIndex].size =
@@ -104,5 +135,9 @@ class ResizableWidgetModel {
     children[widgetIndex].percentage =
         children[widgetIndex].size! / maxSizeWithoutSeparators!;
     return children[widgetIndex].size!;
+  }
+
+  bool _isNearlyZero(double size) {
+    return size < 2;
   }
 }
