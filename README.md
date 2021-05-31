@@ -24,7 +24,7 @@ class MyPage extends StatelessWidget {
           Container(color: Colors.yellowAccent),
           Container(color: Colors.redAccent),
         ],
-        isColumnChildren: false,        // optional
+        isHorizontalSeparator: false,   // optional
         separatorColor: Colors.white12, // optional
         separatorSize: 4,               // optional
         percentages: [0.2, 0.5, 0.3],   // optional
