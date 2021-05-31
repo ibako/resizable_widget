@@ -1,21 +1,13 @@
 import 'package:flutter/material.dart';
-import 'resizable_widget_controller.dart';
+import 'separator_args_info.dart';
 import 'separator_controller.dart';
 
 class Separator extends StatefulWidget {
-  final int _index;
-  final ResizableWidgetController _parentController;
-  final bool isColumnSeparator;
-  final double size;
-  final Color color;
+  final SeparatorArgsInfo info;
 
   const Separator(
-    this._index,
-    this._parentController, {
+    this.info, {
     Key? key,
-    required this.isColumnSeparator,
-    required this.size,
-    required this.color,
   }) : super(key: key);
 
   @override
@@ -23,25 +15,28 @@ class Separator extends StatefulWidget {
 }
 
 class _SeparatorState extends State<Separator> {
+  late SeparatorArgsInfo _info;
   late SeparatorController _controller;
 
   @override
   void initState() {
     super.initState();
 
-    _controller = SeparatorController(widget._index, widget._parentController);
+    _info = widget.info;
+    _controller =
+        SeparatorController(widget.info.index, widget.info.parentController);
   }
 
   @override
   Widget build(BuildContext context) => GestureDetector(
         child: MouseRegion(
-          cursor: widget.isColumnSeparator
+          cursor: _info.isHorizontalSeparator
               ? SystemMouseCursors.resizeRow
               : SystemMouseCursors.resizeColumn,
           child: SizedBox(
-            child: Container(color: widget.color),
-            width: widget.isColumnSeparator ? double.infinity : widget.size,
-            height: widget.isColumnSeparator ? widget.size : double.infinity,
+            child: Container(color: _info.color),
+            width: _info.isHorizontalSeparator ? double.infinity : _info.size,
+            height: _info.isHorizontalSeparator ? _info.size : double.infinity,
           ),
         ),
         onPanUpdate: (details) => _controller.onPanUpdate(details, context),

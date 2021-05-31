@@ -1,84 +1,34 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'resizable_widget.dart';
+import 'resizable_widget_args_info.dart';
 import 'resizable_widget_child_data.dart';
+import 'resizable_widget_model.dart';
 import 'separator.dart';
-import 'widget_size_info.dart';
+import 'separator_args_info.dart';
 
 class ResizableWidgetController {
   final eventStream = StreamController<Object>();
-  final children = <ResizableWidgetChildData>[];
-  final double separatorSize;
-  final bool isHorizontalSeparator;
-  final OnResizedFunc? onResized;
-  double? maxSize;
-  double? get maxSizeWithoutSeparators => maxSize == null
-      ? null
-      : maxSize! - (children.length ~/ 2) * separatorSize;
+  final ResizableWidgetModel _model;
+  List<ResizableWidgetChildData> get children => _model.children;
 
-  ResizableWidgetController(
-      this.separatorSize, this.isHorizontalSeparator, this.onResized);
+  ResizableWidgetController(ResizableWidgetArgsInfo info)
+      : _model = ResizableWidgetModel(info) {
+    _model.init(_separatorFactory);
+  }
 
   void setSizeIfNeeded(BoxConstraints constraints) {
-    final max =
-        isHorizontalSeparator ? constraints.maxHeight : constraints.maxWidth;
-    var isMaxSizeChanged = maxSize == null || maxSize! != max;
-    if (!isMaxSizeChanged || children.isEmpty) {
-      return;
-    }
-
-    maxSize = max;
-    final remain = maxSizeWithoutSeparators!;
-
-    for (var c in children) {
-      if (c.widget is Separator) {
-        c.percentage = 0;
-        c.size = separatorSize;
-      } else {
-        c.size = remain * c.percentage!;
-      }
-    }
-
-    _callOnResized();
+    _model.setSizeIfNeeded(constraints);
+    _model.callOnResized();
   }
 
   void resize(int separatorIndex, Offset offset) {
-    final leftSize = _resizeImpl(separatorIndex - 1, offset);
-    final rightSize = _resizeImpl(separatorIndex + 1, offset * (-1));
-
-    if (leftSize < 0) {
-      _resizeImpl(separatorIndex - 1,
-          isHorizontalSeparator ? Offset(0, -leftSize) : Offset(-leftSize, 0));
-      _resizeImpl(separatorIndex + 1,
-          isHorizontalSeparator ? Offset(0, leftSize) : Offset(leftSize, 0));
-    }
-    if (rightSize < 0) {
-      _resizeImpl(separatorIndex - 1,
-          isHorizontalSeparator ? Offset(0, rightSize) : Offset(rightSize, 0));
-      _resizeImpl(
-          separatorIndex + 1,
-          isHorizontalSeparator
-              ? Offset(0, -rightSize)
-              : Offset(-rightSize, 0));
-    }
+    _model.resize(separatorIndex, offset);
 
     eventStream.add(this);
-    _callOnResized();
+    _model.callOnResized();
   }
 
-  double _resizeImpl(int widgetIndex, Offset offset) {
-    final size = children[widgetIndex].size ?? 0;
-    children[widgetIndex].size =
-        size + (isHorizontalSeparator ? offset.dy : offset.dx);
-    children[widgetIndex].percentage =
-        children[widgetIndex].size! / maxSizeWithoutSeparators!;
-    return children[widgetIndex].size!;
-  }
-
-  void _callOnResized() {
-    onResized?.call(children
-        .where((x) => x.widget is! Separator)
-        .map((x) => WidgetSizeInfo(x.size!, x.percentage!))
-        .toList());
+  Widget _separatorFactory(SeparatorArgsBasicInfo basicInfo) {
+    return Separator(SeparatorArgsInfo(this, basicInfo));
   }
 }

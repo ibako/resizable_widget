@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:resizable_widget/src/resizable_widget_args_info.dart';
 import 'resizable_widget_child_data.dart';
 import 'resizable_widget_controller.dart';
 import 'separator.dart';
@@ -64,38 +65,15 @@ class ResizableWidget extends StatefulWidget {
 }
 
 class _ResizableWidgetState extends State<ResizableWidget> {
+  late ResizableWidgetArgsInfo _info;
   late ResizableWidgetController _controller;
 
   @override
   void initState() {
     super.initState();
 
-    // TODO: delete the deprecated member on the next minor update.
-    final isHorizontalSeparator =
-        // ignore: deprecated_member_use_from_same_package
-        widget.isHorizontalSeparator || widget.isColumnChildren;
-
-    _controller = ResizableWidgetController(
-        widget.separatorSize, isHorizontalSeparator, widget.onResized);
-    final originalChildren = widget.children;
-    final size = originalChildren.length;
-    final originalPercentages =
-        widget.percentages ?? List.filled(size, 1 / size);
-    for (var i = 0; i < size - 1; i++) {
-      _controller.children.add(ResizableWidgetChildData(
-          originalChildren[i], originalPercentages[i]));
-      _controller.children.add(ResizableWidgetChildData(
-          Separator(
-            2 * i + 1,
-            _controller,
-            isColumnSeparator: _controller.isHorizontalSeparator,
-            size: _controller.separatorSize,
-            color: widget.separatorColor,
-          ),
-          null));
-    }
-    _controller.children.add(ResizableWidgetChildData(
-        originalChildren[size - 1], originalPercentages[size - 1]));
+    _info = ResizableWidgetArgsInfo(widget);
+    _controller = ResizableWidgetController(_info);
   }
 
   @override
@@ -104,7 +82,7 @@ class _ResizableWidgetState extends State<ResizableWidget> {
           _controller.setSizeIfNeeded(constraints);
           return StreamBuilder(
             stream: _controller.eventStream.stream,
-            builder: (context, snapshot) => _controller.isHorizontalSeparator
+            builder: (context, snapshot) => _info.isHorizontalSeparator
                 ? Column(
                     children: _controller.children.map(_buildChild).toList())
                 : Row(children: _controller.children.map(_buildChild).toList()),
@@ -118,8 +96,8 @@ class _ResizableWidgetState extends State<ResizableWidget> {
     }
 
     return SizedBox(
-      width: _controller.isHorizontalSeparator ? double.infinity : child.size,
-      height: _controller.isHorizontalSeparator ? child.size : double.infinity,
+      width: _info.isHorizontalSeparator ? double.infinity : child.size,
+      height: _info.isHorizontalSeparator ? child.size : double.infinity,
       child: child.widget,
     );
   }
