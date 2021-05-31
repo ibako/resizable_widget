@@ -29,6 +29,7 @@ class MyPage extends StatelessWidget {
       ),
       body: ResizableWidget(
         isHorizontalSeparator: false,
+        isDisabledSmartHide: false,
         separatorColor: Colors.white12,
         separatorSize: 4,
         onResized: _printResizeInfo,
