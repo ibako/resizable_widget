@@ -4,7 +4,7 @@ class ResizableWidgetChildData {
   final Widget widget;
   double? size;
   double? percentage;
-  double? defaultSize;
-  double? hidingSize;
+  double? defaultPercentage;
+  double? hidingPercentage;
   ResizableWidgetChildData(this.widget, this.percentage);
 }

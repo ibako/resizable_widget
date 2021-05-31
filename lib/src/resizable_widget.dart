@@ -30,6 +30,12 @@ class ResizableWidget extends StatefulWidget {
   /// When set to true, creates horizontal separators.
   final bool isHorizontalSeparator;
 
+  /// When set to true, Smart-Hide-Function is disabled.
+  ///
+  /// Smart-Hide-Function is that users can hide / show the both ends widgets
+  /// by double-clicking the separators.
+  final bool isDisabledSmartHide;
+
   /// Separator size.
   final double separatorSize;
 
@@ -50,6 +56,7 @@ class ResizableWidget extends StatefulWidget {
     @Deprecated('Use [isHorizontalSeparator] instead')
         this.isColumnChildren = false,
     this.isHorizontalSeparator = false,
+    this.isDisabledSmartHide = false,
     this.separatorSize = 4,
     this.separatorColor = Colors.white12,
     this.onResized,

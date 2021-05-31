@@ -29,6 +29,7 @@ class ResizableWidgetModel {
           separatorFactory.call(SeparatorArgsBasicInfo(
             2 * i + 1,
             _info.isHorizontalSeparator,
+            _info.isDisabledSmartHide,
             _info.separatorSize,
             _info.separatorColor,
           )),
@@ -56,7 +57,7 @@ class ResizableWidgetModel {
         c.size = _info.separatorSize;
       } else {
         c.size = remain * c.percentage!;
-        c.defaultSize = c.size;
+        c.defaultPercentage = c.percentage;
       }
     }
   }
@@ -99,6 +100,10 @@ class ResizableWidgetModel {
   }
 
   bool tryHideOrShow(int separatorIndex) {
+    if (_info.isDisabledSmartHide) {
+      return false;
+    }
+
     final isLeft = separatorIndex == 1;
     final isRight = separatorIndex == children.length - 2;
     if (!isLeft && !isRight) {
@@ -111,17 +116,20 @@ class ResizableWidgetModel {
     final coefficient = isLeft ? 1 : -1;
     if (_isNearlyZero(size)) {
       // show
-      final offsetScala = (target.hidingSize ?? target.defaultSize!) - size;
+      final offsetScala =
+          maxSize! * (target.hidingPercentage ?? target.defaultPercentage!) -
+              size;
       final offset = _info.isHorizontalSeparator
           ? Offset(0, offsetScala * coefficient)
           : Offset(offsetScala * coefficient, 0);
       resize(separatorIndex, offset);
     } else {
       // hide
-      target.hidingSize = target.size!;
+      target.hidingPercentage = target.percentage!;
+      final offsetScala = maxSize! * target.hidingPercentage!;
       final offset = _info.isHorizontalSeparator
-          ? Offset(0, -target.hidingSize! * coefficient)
-          : Offset(-target.hidingSize! * coefficient, 0);
+          ? Offset(0, -offsetScala * coefficient)
+          : Offset(-offsetScala * coefficient, 0);
       resize(separatorIndex, offset);
     }
 
