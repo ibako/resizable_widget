@@ -9,7 +9,7 @@ class ResizableWidgetController {
   final eventStream = StreamController<Object>();
   final children = <ResizableWidgetChildData>[];
   final double separatorSize;
-  final bool isColumnChildren;
+  final bool isHorizontalSeparator;
   final OnResizedFunc? onResized;
   double? maxSize;
   double? get maxSizeWithoutSeparators => maxSize == null
@@ -17,10 +17,11 @@ class ResizableWidgetController {
       : maxSize! - (children.length ~/ 2) * separatorSize;
 
   ResizableWidgetController(
-      this.separatorSize, this.isColumnChildren, this.onResized);
+      this.separatorSize, this.isHorizontalSeparator, this.onResized);
 
   void setSizeIfNeeded(BoxConstraints constraints) {
-    final max = isColumnChildren ? constraints.maxHeight : constraints.maxWidth;
+    final max =
+        isHorizontalSeparator ? constraints.maxHeight : constraints.maxWidth;
     var isMaxSizeChanged = maxSize == null || maxSize! != max;
     if (!isMaxSizeChanged || children.isEmpty) {
       return;
@@ -47,15 +48,18 @@ class ResizableWidgetController {
 
     if (leftSize < 0) {
       _resizeImpl(separatorIndex - 1,
-          isColumnChildren ? Offset(0, -leftSize) : Offset(-leftSize, 0));
+          isHorizontalSeparator ? Offset(0, -leftSize) : Offset(-leftSize, 0));
       _resizeImpl(separatorIndex + 1,
-          isColumnChildren ? Offset(0, leftSize) : Offset(leftSize, 0));
+          isHorizontalSeparator ? Offset(0, leftSize) : Offset(leftSize, 0));
     }
     if (rightSize < 0) {
       _resizeImpl(separatorIndex - 1,
-          isColumnChildren ? Offset(0, rightSize) : Offset(rightSize, 0));
-      _resizeImpl(separatorIndex + 1,
-          isColumnChildren ? Offset(0, -rightSize) : Offset(-rightSize, 0));
+          isHorizontalSeparator ? Offset(0, rightSize) : Offset(rightSize, 0));
+      _resizeImpl(
+          separatorIndex + 1,
+          isHorizontalSeparator
+              ? Offset(0, -rightSize)
+              : Offset(-rightSize, 0));
     }
 
     eventStream.add(this);
@@ -65,7 +69,7 @@ class ResizableWidgetController {
   double _resizeImpl(int widgetIndex, Offset offset) {
     final size = children[widgetIndex].size ?? 0;
     children[widgetIndex].size =
-        size + (isColumnChildren ? offset.dy : offset.dx);
+        size + (isHorizontalSeparator ? offset.dy : offset.dx);
     children[widgetIndex].percentage =
         children[widgetIndex].size! / maxSizeWithoutSeparators!;
     return children[widgetIndex].size!;

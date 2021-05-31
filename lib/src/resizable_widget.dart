@@ -70,8 +70,13 @@ class _ResizableWidgetState extends State<ResizableWidget> {
   void initState() {
     super.initState();
 
+    // TODO: delete the deprecated member on the next minor update.
+    final isHorizontalSeparator =
+        // ignore: deprecated_member_use_from_same_package
+        widget.isHorizontalSeparator || widget.isColumnChildren;
+
     _controller = ResizableWidgetController(
-        widget.separatorSize, _isHorizontalSeparator(), widget.onResized);
+        widget.separatorSize, isHorizontalSeparator, widget.onResized);
     final originalChildren = widget.children;
     final size = originalChildren.length;
     final originalPercentages =
@@ -83,8 +88,8 @@ class _ResizableWidgetState extends State<ResizableWidget> {
           Separator(
             2 * i + 1,
             _controller,
-            isColumnSeparator: _isHorizontalSeparator(),
-            size: widget.separatorSize,
+            isColumnSeparator: _controller.isHorizontalSeparator,
+            size: _controller.separatorSize,
             color: widget.separatorColor,
           ),
           null));
@@ -99,7 +104,7 @@ class _ResizableWidgetState extends State<ResizableWidget> {
           _controller.setSizeIfNeeded(constraints);
           return StreamBuilder(
             stream: _controller.eventStream.stream,
-            builder: (context, snapshot) => _controller.isColumnChildren
+            builder: (context, snapshot) => _controller.isHorizontalSeparator
                 ? Column(
                     children: _controller.children.map(_buildChild).toList())
                 : Row(children: _controller.children.map(_buildChild).toList()),
@@ -113,15 +118,9 @@ class _ResizableWidgetState extends State<ResizableWidget> {
     }
 
     return SizedBox(
-      width: _isHorizontalSeparator() ? double.infinity : child.size,
-      height: _isHorizontalSeparator() ? child.size : double.infinity,
+      width: _controller.isHorizontalSeparator ? double.infinity : child.size,
+      height: _controller.isHorizontalSeparator ? child.size : double.infinity,
       child: child.widget,
     );
-  }
-
-  bool _isHorizontalSeparator() {
-    // TODO: delete the deprecated member on the next minor update.
-    // ignore: deprecated_member_use_from_same_package
-    return widget.isHorizontalSeparator || widget.isColumnChildren;
   }
 }
