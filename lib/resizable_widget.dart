@@ -22,7 +22,11 @@ class ResizableWidget extends StatefulWidget {
   final List<double>? percentages;
 
   /// When set to true, creates horizontal separators.
+  @Deprecated('Use [isHorizontalSeparator] instead')
   final bool isColumnChildren;
+
+  /// When set to true, creates horizontal separators.
+  final bool isHorizontalSeparator;
 
   /// Separator size.
   final double separatorSize;
@@ -41,7 +45,9 @@ class ResizableWidget extends StatefulWidget {
     Key? key,
     required this.children,
     this.percentages,
-    this.isColumnChildren = false,
+    @Deprecated('Use [isHorizontalSeparator] instead')
+        this.isColumnChildren = false,
+    this.isHorizontalSeparator = false,
     this.separatorSize = 4,
     this.separatorColor = Colors.white12,
     this.onResized,
@@ -81,7 +87,7 @@ class _ResizableWidgetState extends State<ResizableWidget> {
     super.initState();
 
     _controller = _ResizableWidgetController(
-        widget.separatorSize, widget.isColumnChildren, widget.onResized);
+        widget.separatorSize, _isHorizontalSeparator(), widget.onResized);
     final originalChildren = widget.children;
     final size = originalChildren.length;
     final originalPercentages =
@@ -93,7 +99,7 @@ class _ResizableWidgetState extends State<ResizableWidget> {
           _Separator(
             2 * i + 1,
             _controller,
-            isColumnSeparator: widget.isColumnChildren,
+            isColumnSeparator: _isHorizontalSeparator(),
             size: widget.separatorSize,
             color: widget.separatorColor,
           ),
@@ -123,10 +129,16 @@ class _ResizableWidgetState extends State<ResizableWidget> {
     }
 
     return SizedBox(
-      width: widget.isColumnChildren ? double.infinity : child.size,
-      height: widget.isColumnChildren ? child.size : double.infinity,
+      width: _isHorizontalSeparator() ? double.infinity : child.size,
+      height: _isHorizontalSeparator() ? child.size : double.infinity,
       child: child.widget,
     );
+  }
+
+  bool _isHorizontalSeparator() {
+    // TODO: delete the deprecated member on the next minor update.
+    // ignore: deprecated_member_use_from_same_package
+    return widget.isHorizontalSeparator || widget.isColumnChildren;
   }
 }
 
