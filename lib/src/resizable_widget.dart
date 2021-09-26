@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:resizable_widget/src/resizable_widget_args_info.dart';
+import 'resizable_widget_args_info.dart';
 import 'resizable_widget_child_data.dart';
 import 'resizable_widget_controller.dart';
 import 'separator.dart';
@@ -7,6 +7,8 @@ import 'widget_size_info.dart';
 
 /// The callback argument type of [ResizableWidget.onResized].
 typedef OnResizedFunc = void Function(List<WidgetSizeInfo> infoList);
+typedef OnResizeBeginFunc = void Function(int separatorIndex, DragDownDetails details);
+typedef OnResizeEndFunc = void Function(int separatorIndex, DragEndDetails details);
 
 /// Holds resizable widgets as children.
 /// Users can resize the internal widgets by dragging.
@@ -48,23 +50,27 @@ class ResizableWidget extends StatefulWidget {
   /// Note that [onResized] is called every frame when resizing [children].
   final OnResizedFunc? onResized;
 
+  final OnResizeBeginFunc? onResizeBegin;
+
+  final OnResizeEndFunc? onResizeEnd;
+
   /// Creates [ResizableWidget].
   ResizableWidget({
     Key? key,
     required this.children,
     this.percentages,
-    @Deprecated('Use [isHorizontalSeparator] instead')
-        this.isColumnChildren = false,
+    @Deprecated('Use [isHorizontalSeparator] instead') this.isColumnChildren = false,
     this.isHorizontalSeparator = false,
     this.isDisabledSmartHide = false,
     this.separatorSize = 4,
     this.separatorColor = Colors.white12,
     this.onResized,
+    this.onResizeBegin,
+    this.onResizeEnd,
   }) : super(key: key) {
     assert(children.isNotEmpty);
     assert(percentages == null || percentages!.length == children.length);
-    assert(percentages == null ||
-        percentages!.reduce((value, element) => value + element) == 1);
+    assert(percentages == null || percentages!.reduce((value, element) => value + element) == 1);
   }
 
   @override
