@@ -34,13 +34,13 @@ class _MyPageState extends State<MyPage> {
       appBar: AppBar(
         title: const Text('Resizable Widget Example'),
         actions: [
-          IconButton(
+          TextButton(
               onPressed: () {
                 setState(() {
                   _showFirst = !_showFirst;
                 });
               },
-              icon: const Icon(Icons.settings)),
+              child: const Text('Change chidren')),
         ],
       ),
       body: ResizableWidget(
