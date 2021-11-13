@@ -18,14 +18,30 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyPage extends StatelessWidget {
+class MyPage extends StatefulWidget {
   const MyPage({Key? key}) : super(key: key);
+
+  @override
+  State<MyPage> createState() => _MyPageState();
+}
+
+class _MyPageState extends State<MyPage> {
+  bool _showFirst = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Resizable Widget Example'),
+        actions: [
+          TextButton(
+              onPressed: () {
+                setState(() {
+                  _showFirst = !_showFirst;
+                });
+              },
+              child: const Text('Change chidren')),
+        ],
       ),
       body: ResizableWidget(
         isHorizontalSeparator: false,
@@ -34,7 +50,7 @@ class MyPage extends StatelessWidget {
         separatorSize: 4,
         onResized: _printResizeInfo,
         children: [
-          Container(color: Colors.greenAccent),
+          if(_showFirst) Container(color: Colors.greenAccent),
           ResizableWidget(
             isHorizontalSeparator: true,
             separatorColor: Colors.blue,
@@ -47,7 +63,7 @@ class MyPage extends StatelessWidget {
                   Container(color: Colors.yellowAccent),
                   Container(color: Colors.redAccent),
                 ],
-                percentages: const [0.2, 0.5, 0.3],
+                percentages: const [0.2, 0.5, 0.3]
               ),
               Container(color: Colors.redAccent),
             ],

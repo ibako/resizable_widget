@@ -72,15 +72,23 @@ class ResizableWidget extends StatefulWidget {
 }
 
 class _ResizableWidgetState extends State<ResizableWidget> {
-  late ResizableWidgetArgsInfo _info;
   late ResizableWidgetController _controller;
 
   @override
   void initState() {
     super.initState();
-
-    _info = ResizableWidgetArgsInfo(widget);
     _controller = ResizableWidgetController(_info);
+  }  
+  
+  ResizableWidgetArgsInfo get _info => ResizableWidgetArgsInfo(widget) ;
+
+  @override
+  void didUpdateWidget(covariant ResizableWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.children != widget.children) {
+      _controller = ResizableWidgetController(_info);
+      _controller.update();
+    }
   }
 
   @override
