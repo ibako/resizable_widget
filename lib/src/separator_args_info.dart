@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'resizable_widget.dart';
 import 'resizable_widget_controller.dart';
 
 class SeparatorArgsInfo extends SeparatorArgsBasicInfo {
@@ -14,14 +15,16 @@ class SeparatorArgsBasicInfo {
   final bool isDisabledSmartHide;
   final double size;
   final Color color;
+  final SeparatorBuilder? separatorBuilder;
 
   const SeparatorArgsBasicInfo(this.index, this.isHorizontalSeparator,
-      this.isDisabledSmartHide, this.size, this.color);
+      this.isDisabledSmartHide, this.size, this.color, this.separatorBuilder);
 
   SeparatorArgsBasicInfo.clone(SeparatorArgsBasicInfo info)
       : index = info.index,
         isHorizontalSeparator = info.isHorizontalSeparator,
         isDisabledSmartHide = info.isDisabledSmartHide,
         size = info.size,
-        color = info.color;
+        color = info.color,
+        separatorBuilder = info.separatorBuilder;
 }

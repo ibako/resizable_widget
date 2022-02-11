@@ -8,7 +8,10 @@ class ResizableWidgetArgsInfo {
   final bool isDisabledSmartHide;
   final double separatorSize;
   final Color separatorColor;
+  final SeparatorBuilder? separatorBuilder;
+  final OnResizeBeginFunc? onResizeBegin;
   final OnResizedFunc? onResized;
+  final OnResizeEndFunc? onResizeEnd;
 
   ResizableWidgetArgsInfo(ResizableWidget widget)
       : children = widget.children,
@@ -20,5 +23,8 @@ class ResizableWidgetArgsInfo {
         isDisabledSmartHide = widget.isDisabledSmartHide,
         separatorSize = widget.separatorSize,
         separatorColor = widget.separatorColor,
-        onResized = widget.onResized;
+        separatorBuilder = widget.separatorBuilder,
+        onResized = widget.onResized,
+        onResizeBegin = widget.onResizeBegin,
+        onResizeEnd = widget.onResizeEnd;
 }

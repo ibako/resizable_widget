@@ -20,11 +20,9 @@ class ResizableWidgetModel {
   void init(SeparatorFactory separatorFactory) {
     final originalChildren = _info.children;
     final size = originalChildren.length;
-    final originalPercentages =
-        _info.percentages ?? List.filled(size, 1 / size);
+    final originalPercentages = _info.percentages ?? List.filled(size, 1 / size);
     for (var i = 0; i < size - 1; i++) {
-      children.add(ResizableWidgetChildData(
-          originalChildren[i], originalPercentages[i]));
+      children.add(ResizableWidgetChildData(originalChildren[i], originalPercentages[i]));
       children.add(ResizableWidgetChildData(
           separatorFactory.call(SeparatorArgsBasicInfo(
             2 * i + 1,
@@ -32,6 +30,7 @@ class ResizableWidgetModel {
             _info.isDisabledSmartHide,
             _info.separatorSize,
             _info.separatorColor,
+            _info.separatorBuilder,
           )),
           null));
     }
@@ -60,6 +59,10 @@ class ResizableWidgetModel {
         c.defaultPercentage = c.percentage;
       }
     }
+  }
+
+  void resizeStart(int separatorIndex, DragDownDetails details) {
+    _info.onResizeBegin?.call(separatorIndex, details);
   }
 
   void resize(int separatorIndex, Offset offset) {
@@ -92,11 +95,21 @@ class ResizableWidgetModel {
     }
   }
 
+  void resizeEnd(int separatorIndex, DragEndDetails details) {
+    _info.onResizeEnd?.call(separatorIndex, details);
+  }
+
+  void callResizedBegin(int separatorIndex, DragDownDetails details) {
+    _info.onResizeBegin?.call(separatorIndex, details);
+  }
+
   void callOnResized() {
-    _info.onResized?.call(children
-        .where((x) => x.widget is! Separator)
-        .map((x) => WidgetSizeInfo(x.size!, x.percentage!))
-        .toList());
+    _info.onResized?.call(
+        children.where((x) => x.widget is! Separator).map((x) => WidgetSizeInfo(x.size!, x.percentage!)).toList());
+  }
+
+  void callResizedEnd(int separatorIndex, DragEndDetails details) {
+    _info.onResizeEnd?.call(separatorIndex, details);
   }
 
   bool tryHideOrShow(int separatorIndex) {

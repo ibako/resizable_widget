@@ -11,8 +11,7 @@ class ResizableWidgetController {
   final ResizableWidgetModel _model;
   List<ResizableWidgetChildData> get children => _model.children;
 
-  ResizableWidgetController(ResizableWidgetArgsInfo info)
-      : _model = ResizableWidgetModel(info) {
+  ResizableWidgetController(ResizableWidgetArgsInfo info) : _model = ResizableWidgetModel(info) {
     _model.init(_separatorFactory);
   }
 
@@ -21,11 +20,23 @@ class ResizableWidgetController {
     _model.callOnResized();
   }
 
+  void resizeStart(int separatorIndex, DragDownDetails details) {
+    _model.resizeStart(separatorIndex, details);
+    eventStream.add(this);
+    _model.callResizedBegin(separatorIndex, details);
+  }
+
   void resize(int separatorIndex, Offset offset) {
     _model.resize(separatorIndex, offset);
 
     eventStream.add(this);
     _model.callOnResized();
+  }
+
+  void resizeEnd(int separatorIndex, DragEndDetails details) {
+    _model.resizeEnd(separatorIndex, details);
+    eventStream.add(this);
+    _model.callResizedEnd(separatorIndex, details);
   }
 
   void tryHideOrShow(int separatorIndex) {
