@@ -75,7 +75,7 @@ class ResizableWidget extends StatefulWidget {
     assert(percentages == null ||
         percentages!.reduce((value, element) => value + element) == 1);
     assert(maxPercentages == null || maxPercentages!.contains(double.infinity));
-    assert(minPercentages == null || minPercentages!.contains(0));
+    assert(minPercentages == null || minPercentages!.reduce((value, element) => value! + element!)! < 1);
   }
 
   @override
