@@ -23,6 +23,13 @@ class ResizableWidget extends StatefulWidget {
   /// If this value is [null], [children] will be split into the same size.
   final List<double>? percentages;
 
+  /// Applies a Maximum Percent of the screen each widget can occupy
+  /// At least one element must be set to double.infinity
+  final List<double?>? maxPercentages;
+  /// Applies a Minimum Percent of the screen each widget can occupy
+  /// At least one element must be set to 0.0
+  final List<double?>? minPercentages;
+
   /// When set to true, creates horizontal separators.
   @Deprecated('Use [isHorizontalSeparator] instead')
   final bool isColumnChildren;
@@ -53,6 +60,8 @@ class ResizableWidget extends StatefulWidget {
     Key? key,
     required this.children,
     this.percentages,
+    this.maxPercentages,
+    this.minPercentages,
     @Deprecated('Use [isHorizontalSeparator] instead')
         this.isColumnChildren = false,
     this.isHorizontalSeparator = false,
@@ -65,6 +74,8 @@ class ResizableWidget extends StatefulWidget {
     assert(percentages == null || percentages!.length == children.length);
     assert(percentages == null ||
         percentages!.reduce((value, element) => value + element) == 1);
+    assert(maxPercentages == null || maxPercentages!.contains(double.infinity));
+    assert(minPercentages == null || minPercentages!.reduce((value, element) => value! + element!)! < 1);
   }
 
   @override
