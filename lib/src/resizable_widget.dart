@@ -24,10 +24,10 @@ class ResizableWidget extends StatefulWidget {
   final List<double>? percentages;
 
   /// Applies a Maximum Percent of the screen each widget can occupy
-  /// One element must be set to null
+  /// At least one element must be set to double.infinity
   final List<double?>? maxPercentages;
   /// Applies a Minimum Percent of the screen each widget can occupy
-  /// One element must be set to null
+  /// At least one element must be set to 0.0
   final List<double?>? minPercentages;
 
   /// When set to true, creates horizontal separators.
@@ -74,8 +74,8 @@ class ResizableWidget extends StatefulWidget {
     assert(percentages == null || percentages!.length == children.length);
     assert(percentages == null ||
         percentages!.reduce((value, element) => value + element) == 1);
-    assert(maxPercentages == null || maxPercentages!.contains(null));
-    assert(minPercentages == null || minPercentages!.contains(null));
+    assert(maxPercentages == null || maxPercentages!.contains(double.infinity));
+    assert(minPercentages == null || minPercentages!.contains(0));
   }
 
   @override
