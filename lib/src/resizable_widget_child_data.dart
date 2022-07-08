@@ -6,5 +6,7 @@ class ResizableWidgetChildData {
   double? percentage;
   double? defaultPercentage;
   double? hidingPercentage;
-  ResizableWidgetChildData(this.widget, this.percentage);
+  double? maxPercentage;
+  double? minPercentage;
+  ResizableWidgetChildData(this.widget, this.percentage, this.maxPercentage, this.minPercentage);
 }
