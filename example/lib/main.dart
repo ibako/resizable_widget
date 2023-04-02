@@ -13,15 +13,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Resizable Widget Example',
       theme: ThemeData.dark(),
-      home:  MyPage(),
+      home: const MyPage(),
     );
   }
 }
 
-class MyPage extends StatelessWidget {
-   MyPage({Key? key}) : super(key: key);
+GlobalKey<ResizableWidgetState> resizableWidgetKey = GlobalKey();
 
-  GlobalKey<ResizableWidgetState> resizableWidgetKey = GlobalKey();
+class MyPage extends StatelessWidget {
+   const MyPage({Key? key}) : super(key: key);
 
 
   @override
