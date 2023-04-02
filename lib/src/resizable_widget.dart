@@ -68,10 +68,10 @@ class ResizableWidget extends StatefulWidget {
   }
 
   @override
-  _ResizableWidgetState createState() => _ResizableWidgetState();
+  ResizableWidgetState createState() => ResizableWidgetState();
 }
 
-class _ResizableWidgetState extends State<ResizableWidget> {
+class ResizableWidgetState extends State<ResizableWidget> {
   late ResizableWidgetArgsInfo _info;
   late ResizableWidgetController _controller;
 
@@ -107,5 +107,10 @@ class _ResizableWidgetState extends State<ResizableWidget> {
       height: _info.isHorizontalSeparator ? child.size : double.infinity,
       child: child.widget,
     );
+  }
+
+  /// Resizes the internal widgets by move separator.
+  void moveSeparator(int separatorIndex, Offset offset) {
+    _controller.resize(separatorIndex, offset);
   }
 }

@@ -13,13 +13,16 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Resizable Widget Example',
       theme: ThemeData.dark(),
-      home: const MyPage(),
+      home:  MyPage(),
     );
   }
 }
 
 class MyPage extends StatelessWidget {
-  const MyPage({Key? key}) : super(key: key);
+   MyPage({Key? key}) : super(key: key);
+
+  GlobalKey<ResizableWidgetState> resizableWidgetKey = GlobalKey();
+
 
   @override
   Widget build(BuildContext context) {
@@ -27,32 +30,48 @@ class MyPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Resizable Widget Example'),
       ),
-      body: ResizableWidget(
-        isHorizontalSeparator: false,
-        isDisabledSmartHide: false,
-        separatorColor: Colors.white12,
-        separatorSize: 4,
-        onResized: _printResizeInfo,
+      body: Column(
         children: [
-          Container(color: Colors.greenAccent),
-          ResizableWidget(
-            isHorizontalSeparator: true,
-            separatorColor: Colors.blue,
-            separatorSize: 10,
-            children: [
-              Container(color: Colors.greenAccent),
-              ResizableWidget(
-                children: [
-                  Container(color: Colors.greenAccent),
-                  Container(color: Colors.yellowAccent),
-                  Container(color: Colors.redAccent),
-                ],
-                percentages: const [0.2, 0.5, 0.3],
-              ),
-              Container(color: Colors.redAccent),
-            ],
+          SizedBox(
+            height: 600,
+            child: ResizableWidget(
+              key: resizableWidgetKey,
+              isHorizontalSeparator: false,
+              isDisabledSmartHide: false,
+              separatorColor: Colors.white12,
+              separatorSize: 4,
+              onResized: _printResizeInfo,
+              children: [
+                Container(color: Colors.greenAccent),
+                Container(color: Colors.redAccent),
+              ],
+            ),
           ),
-          Container(color: Colors.redAccent),
+          SizedBox(
+            height: 40,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                /// two buttons to test the [ResizableWidget] with [isDisabledSmartHide] = true
+                TextButton(
+                  onPressed: () {
+                    // ResizableWidget.of(context)?.hideSeparator(0);
+                    const offset = Offset(-100, 0);
+                    resizableWidgetKey.currentState?.moveSeparator(1, offset);
+                  },
+                  child: const Text('Hide 0'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // ResizableWidget.of(context)?.showSeparator(0);
+                    const offset = Offset(100, 0);
+                    resizableWidgetKey.currentState?.moveSeparator(1, offset);
+                  },
+                  child: const Text('Show 0'),
+                ),
+              ],
+            ),
+          )
         ],
       ),
     );
